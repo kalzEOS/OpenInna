@@ -1,0 +1,2 @@
+set(__QT_DEPLOY_TARGET_mpv_player_FILE /home/kalzi/Projects/mpv_player/build/mpv_player)
+set(__QT_DEPLOY_TARGET_mpv_player_TYPE EXECUTABLE)

@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+673ce876098ea73f5003760a16b77903 CMakeFiles/mpv_player_autogen
+b45b737277a7a3c827d66100f41fc18f mpv_player_autogen/timestamp
+1dc7a48c6481512ff2b8090599560082 qrc_resources.cpp

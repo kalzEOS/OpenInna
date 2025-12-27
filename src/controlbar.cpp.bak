@@ -1,0 +1,146 @@
+// controlbar.cpp
+#include "controlbar.h"
+#include <QHBoxLayout>
+#include <QGraphicsBlurEffect>
+#include <QPropertyAnimation>
+#include <QPainter>
+#include <QEnterEvent>
+#include <QLinearGradient>
+
+ControlBar::ControlBar(QWidget *parent)
+: QWidget(parent)
+{
+    setAttribute(Qt::WA_TranslucentBackground);
+    setMouseTracking(true);
+
+    setFixedHeight(90);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    // Frosted glass blur – IINA style
+    auto *blur = new QGraphicsBlurEffect(this);
+    blur->setBlurRadius(20);
+    setGraphicsEffect(blur);
+
+    // Auto-hide timer
+    hideTimer = new QTimer(this);
+    hideTimer->setSingleShot(true);
+    connect(hideTimer, &QTimer::timeout, this, &ControlBar::fadeOut);
+
+    // ──────── UI Controls ────────
+    playButton = new QPushButton("Play", this);          // ← Text, not symbol
+    playButton->setFixedSize(44, 44);
+    playButton->setCursor(Qt::PointingHandCursor);
+
+    seekSlider = new QSlider(Qt::Horizontal, this);
+    seekSlider->setMaximum(1000);
+
+    timeLabel = new QLabel("00:00 / 00:00", this);
+    timeLabel->setFixedWidth(140);
+    timeLabel->setAlignment(Qt::AlignCenter);
+
+    volumeSlider = new QSlider(Qt::Horizontal, this);
+    volumeSlider->setFixedWidth(100);
+    volumeSlider->setRange(0, 100);
+    volumeSlider->setValue(50);
+
+    auto *volumeIcon = new QPushButton("Speaker", this); // ← Text, not symbol
+    volumeIcon->setFixedSize(30, 30);
+    volumeIcon->setStyleSheet("background: transparent; border: none; color: white;");
+
+    // Layout
+    auto *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(25, 15, 25, 15);
+    layout->setSpacing(20);
+    layout->addWidget(playButton);
+    layout->addWidget(seekSlider, 1);
+    layout->addWidget(timeLabel);
+    layout->addWidget(volumeIcon);
+    layout->addWidget(volumeSlider);
+
+    // Mute toggle
+    connect(volumeIcon, &QPushButton::clicked, this, [this]() {
+        static bool muted = false;
+        muted = !muted;
+        volumeSlider->setValue(muted ? 0 : 50);
+    });
+
+    // Style – exact IINA look
+    setStyleSheet(R"(
+        ControlBar { background: rgba(20,20,20,200); border-radius: 14px; }
+        QPushButton { color: white; background: transparent; border: none; font-size: 20px; }
+        QPushButton:hover { background: rgba(255,255,255,15); border-radius: 8px; }
+        QLabel { color: #ffffffcc; font: 13px "Segoe UI", Arial; }
+        QSlider::groove:horizontal { height: 4px; background: #ffffff40; border-radius: 2px; }
+        QSlider::sub-page:horizontal { background: white; border-radius: 2px; }
+        QSlider::handle:horizontal { width: 13px; height: 13px; background: white; border-radius: 6.5px; margin: -5px 0; }
+        QSlider::handle:horizontal:hover { width: 16px; height: 16px; background: #f0f0f0; }
+    )");
+
+    // Start completely hidden
+    setWindowOpacity(0.0);
+    hide();
+}
+
+void ControlBar::fadeIn()
+{
+    hideTimer->stop();
+    show();
+    raise();
+
+    auto *anim = new QPropertyAnimation(this, "windowOpacity", this);
+    anim->setDuration(220);
+    anim->setStartValue(windowOpacity());
+    anim->setEndValue(1.0);
+    anim->setEasingCurve(QEasingCurve::OutCubic);
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void ControlBar::fadeOut()
+{
+    auto *anim = new QPropertyAnimation(this, "windowOpacity", this);
+    anim->setDuration(300);
+    anim->setStartValue(windowOpacity());
+    anim->setEndValue(0.0);
+    anim->setEasingCurve(QEasingCurve::OutCubic);
+    connect(anim, &QPropertyAnimation::finished, this, &QWidget::hide);
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void ControlBar::enterEvent(QEnterEvent *event)
+{
+    mouseInside = true;
+    fadeIn();
+    QWidget::enterEvent(event);
+}
+
+void ControlBar::leaveEvent(QEvent *event)
+{
+    mouseInside = false;
+    hideTimer->start(2000);
+    QWidget::leaveEvent(event);
+}
+
+void ControlBar::paintEvent(QPaintEvent *event)
+{
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+
+    QLinearGradient grad(0, 0, 0, height());
+    grad.setColorAt(0, QColor(30, 30, 30, 220));
+    grad.setColorAt(1, QColor(10, 10, 10, 230));
+
+    p.setBrush(grad);
+    p.setPen(Qt::NoPen);
+    p.drawRoundedRect(rect(), 14, 14);
+
+    p.setPen(QPen(QColor(255,255,255,30), 1));
+    p.drawLine(14, 1, width()-14, 1);
+
+    QWidget::paintEvent(event);
+}
+
+void ControlBar::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    update();
+}

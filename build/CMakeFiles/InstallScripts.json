@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/kalzi/Projects/mpv_player/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

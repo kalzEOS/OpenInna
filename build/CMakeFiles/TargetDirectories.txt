@@ -1,0 +1,9 @@
+/home/kalzi/Projects/mpv_player/build/CMakeFiles/mpv_player.dir
+/home/kalzi/Projects/mpv_player/build/CMakeFiles/edit_cache.dir
+/home/kalzi/Projects/mpv_player/build/CMakeFiles/rebuild_cache.dir
+/home/kalzi/Projects/mpv_player/build/CMakeFiles/list_install_components.dir
+/home/kalzi/Projects/mpv_player/build/CMakeFiles/install.dir
+/home/kalzi/Projects/mpv_player/build/CMakeFiles/install/local.dir
+/home/kalzi/Projects/mpv_player/build/CMakeFiles/install/strip.dir
+/home/kalzi/Projects/mpv_player/build/CMakeFiles/mpv_player_autogen_timestamp_deps.dir
+/home/kalzi/Projects/mpv_player/build/CMakeFiles/mpv_player_autogen.dir

@@ -1,0 +1,2 @@
+/usr/local/bin/mpv_player
+/usr/local/share/mpv_player/resources.qrc
