@@ -19,3 +19,6 @@ qrc_*.cpp
 *.swo
 *~
 .DS_Store
+
+.vscode/
+
